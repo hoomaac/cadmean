@@ -10,12 +10,13 @@ from django.contrib.auth.models import (
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, username, email, password=None):
+    def create_user(self, username, name ,email, password=None):
         if not email:
             raise ValueError('Users should have an email address')
 
         user = self.model(
             username=username,
+            name = name,
             email = self.normalize_email(email),
             joined_at=timezone.now()
         )
@@ -26,16 +27,17 @@ class UserManager(BaseUserManager):
         return user
 
 
-    def create_superuser(self, username, email, password):
-        user = self.model(
-            username=username,
-            email=email,
-            password=password,
-            joined_at=timezone.now()
+    def create_superuser(self, username, name, email, password):
+        user = self.create_user(
+            username,
+            name,
+            email, 
+            password
         )
 
+
         user.is_staff = True
-        user.is_superuser = True
+        user.is_admin = True
         user.save()
 
         return user
@@ -49,6 +51,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     avatar = models.ImageField(upload_to='upload/', blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
 
     objects = UserManager()
 
@@ -66,7 +69,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
     @property
-    def is_admin(self):
-        return self.is_admin    
+    def is_superuser(self):
+        return self.is_admin
 
     
