@@ -5,11 +5,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
-from .models import User
-
-
-
-
+from .models import User,Post
 
 
 class UserCreationForm(forms.ModelForm):
@@ -75,11 +71,6 @@ class UserAdmin(BaseUserAdmin):
     )
 
     
-        
-
-    def delete_model(self, request, obj):
-        return super().delete_model(request, obj)
-    
 
     search_fields = ('email', 'username')
     ordering = ('email',)
@@ -87,6 +78,20 @@ class UserAdmin(BaseUserAdmin):
 
 
 
+class PostAdmin(admin.ModelAdmin):
+    class Meta:
+        model = Post
+        fields = ('content', 'user')
+
+
+    fieldsets = (
+        ('Post', {'fields':('content', 'user',)}),
+    )
+
+    list_display = ('user', 'content', 'timestamp')
+    search_fields = ('user__username',)
+    odering = ('-timestamp',)
 
 admin.site.register(User, UserAdmin)
+admin.site.register(Post, PostAdmin)
 admin.site.unregister(Group)

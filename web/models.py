@@ -67,7 +67,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return "@{}".format(self.username)
 
     def get_short_name(self):
-        return self.name
+        return self.username
 
     def get_long_name(self):
         return "{} (@{})".format(self.name, self.username)
@@ -76,4 +76,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_superuser(self):
         return self.is_admin
 
-    
+class Post(models.Model):
+    timestamp = models.DateTimeField(default=timezone.now)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+
+
+    class Meta:
+        default_permissions = ('add', 'view')
