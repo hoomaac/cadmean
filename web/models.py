@@ -4,6 +4,11 @@ import datetime
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser, PermissionsMixin
 )
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
+from django.core.exceptions import PermissionDenied
+
+
 
 
 # Create your models here.
@@ -47,7 +52,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=20)
     username = models.CharField(max_length=10,unique=True)
     email = models.EmailField(max_length=40, unique=True)
-    joined_at = models.DateTimeField(timezone.now) 
+    joined_at = models.DateTimeField(default=timezone.now) 
     avatar = models.ImageField(upload_to='upload/', blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -66,7 +71,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_long_name(self):
         return "{} (@{})".format(self.name, self.username)
-
 
     @property
     def is_superuser(self):
