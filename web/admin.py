@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
-from .models import User,Post
+from .models import (User,Post,Token)
 
 
 class UserCreationForm(forms.ModelForm):
@@ -92,6 +92,8 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ('user__username',)
     odering = ('-timestamp',)
 
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Post, PostAdmin)
+admin.site.register(Token)
 admin.site.unregister(Group)

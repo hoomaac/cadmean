@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 import datetime
 from django.contrib.auth.models import (
-    BaseUserManager, AbstractBaseUser, PermissionsMixin
+    BaseUserManager, AbstractBaseUser, PermissionsMixin,
 )
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
@@ -75,6 +75,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_superuser(self):
         return self.is_admin
+    
+
 
 class Post(models.Model):
     timestamp = models.DateTimeField(default=timezone.now)
@@ -82,5 +84,11 @@ class Post(models.Model):
     content = models.TextField()
 
 
-    class Meta:
-        default_permissions = ('add', 'view')
+
+class Token(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=48)
+
+    def __str__(self):
+        return '{}_token'.format(self.user)
+
