@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+ {%block title %} Login | {{block.super}} {% endblock %}
+
+ {% block content %}
+
+ <div>
+    
+    <form method="POST">
+
+        {% csrf_token %}
+        {{form.as_p}}
+  
+        <button type="submit">Login</button> 
+    </form>
+
+  </div>
+
+
+
+ {% endblock %}
