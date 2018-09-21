@@ -4,17 +4,41 @@
 
  {% block content %}
 
- <div>
+
+ <div class="row justify-content-md-center align-items-center">
+        <div class="col-4">
+        </div>
     
-    <form method="POST">
-
-        {% csrf_token %}
-        {{form.as_p}}
-  
-        <button type="submit">Login</button> 
-    </form>
-
-  </div>
+        <div class="col-4">
+    
+            <form method="POST" action="">
+              {% csrf_token %}
+                {% for field in form %}
+                  {% if field.errors %}
+                      {% for error in field.errors %}
+                      <div class="alert alert-danger">{{error}}</div>
+                      {% endfor %}
+                  {% endif %}
+                  <div class="input-group mb-3">
+                    {{field}}
+                  </div>
+                {% endfor %}
+    
+    
+                <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
+    
+             
+            </form>
+    
+    
+        </div>
+    
+        <div class="col-4">
+    
+        </div>
+    
+    </div>
+    
 
 
 
