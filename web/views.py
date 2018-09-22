@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 
 from . import forms as my_form
-
+from . import models as my_model
 
 
 def index(request):
@@ -73,6 +73,10 @@ def login_user(request):
 
         if user:
             login(request, user)
+            return redirect('index')
+
+        else:
+            messages.error(request, "user dones't exist")
             return redirect(request, 'index')
     
     return render(request, 'web/login.html', {'form':form})
@@ -129,3 +133,31 @@ def post(request):
         
 
         
+#TODO: make stream view for users and global to see posts
+#TODO: make templates for stream
+
+@login_required
+def stream(request, username=None):
+
+    template_name = 'web/stream.html'
+    
+    if username and username != request.user.username:
+        user = my_model.User.objects.get(username=username)
+        if user:
+            stream = user.posts.all().order_by('-id')[:10]
+        
+    else:
+        stream = request.user.get_stream()
+        user = request.user
+        print('user does not exist')
+
+    if username:
+        template_name = 'web/user_stream.html'
+
+    return render(request, template_name, {'stream':stream, 'user':user})
+
+
+# @login_required
+# def user_stream(request, username):
+
+#     return render(request, 'web/user_stream.html', {'username':username})

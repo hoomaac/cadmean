@@ -75,12 +75,20 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_superuser(self):
         return self.is_admin
+
+
+    def get_post(self):
+        return Post.objects.filter(user__username=self)
     
+    def get_stream(self):
+        return Post.objects.filter(
+            user__username = self
+        )
 
 
 class Post(models.Model):
     timestamp = models.DateTimeField(default=timezone.now)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     content = models.TextField()
 
     class Meta:
