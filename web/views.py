@@ -6,9 +6,10 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.views import generic
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
 from django.views.generic.edit import FormView
 from django.contrib import messages
-
+from django.utils.decorators import method_decorator
 
 from . import forms as my_form
 
@@ -20,42 +21,64 @@ def index(request):
 
 
 # class LoginView(generic.FormView):
-    # form_class = AuthenticationForm
-    # success_url = reverse_lazy('index')
-    # template_name = 'web/login.html'
+#     form_class = AuthenticationForm
+#     success_url = reverse_lazy('index')
+#     template_name = 'web/login.html'
  
     # def get_form(self, form_class = None):
     #     if form_class is None:
     #         form_class = self.get_form_class()
         
     #     return form_class(self.request,**self.get_form_kwargs())  
+
+
+    # @method_decorator(csrf_protect)
+    # def dispatch(self, request, *args, **kwargs):
+    #     return super(LoginView, self).dispatch(request, *args, **kwargs)
     
     # def form_valid(self, form):
+    #     messages.success(self.request, 'logged in')
     #     login(self.request, form.get_user()) 
     #     return super().form_valid(form)
 
+
+    # def set_test_cookie(self):
+    #     self.request.session.set_test_cookie()
+
+
+    # def get(self, request, *args, **kwargs):
+
+    #     self.set_test_cookie()
+    #     return super(LoginView, self).get(request, *args , **kwargs)
+
+
+    # def post(self, request, *args, **kwargs):
+    #     form_class = self.get_form_class()
+    #     form = self.get_form(form_class)
+    #     if form.is_valid():
+    #         return self.form_valid(form)
+
+    #     else:
+    #         self.set_test_cookie()
+    #         return self.form_invalid(form)
+
+
 def login_user(request):
+    form = my_form.LoginForm(request.POST or None)
+
     
-    if request.method == 'POST':
-        
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-        if user is None:
-            #TODO: error message should be printed
-            
-            return redirect('login')
-        else:
-            #TODO: success message should be printed 
+    if request.POST and form.is_valid():
+        print('login im here')
+        user = form.login(request)
+
+        if user:
             login(request, user)
-            return redirect('index')
+            return redirect(request, 'index')
+    
+    return render(request, 'web/login.html', {'form':form})
+    
 
-    else:
-        form = my_form.LoginForm() 
-
-    return render(request, 'web/login.html', {'form': form})
-
-
+    
 @login_required
 def logout_user(request):
     logout(request)
@@ -85,7 +108,6 @@ def register(request):
 @login_required
 def post(request):
 
-    user = request.user
     if request.method == 'POST':
         form = my_form.PostForm(request.POST)
         
@@ -94,12 +116,10 @@ def post(request):
             post_obj.user = request.user
             post_obj.save()
             
-            print(form.cleaned_data.get('content'))
             messages.success(request, 'posted')
-            return redirect('post')
+            return redirect('index')
         else:
-            print('failed')
-            print(request.user)
+            
             messages.error(request, 'wrong')
             return redirect('post')
     else:

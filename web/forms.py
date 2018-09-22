@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django import forms 
+from django.contrib.auth import authenticate
 
 from . import models as my_model
 
@@ -20,20 +21,40 @@ class RegisterForm(UserCreationForm):
 
 
 class LoginForm(forms.Form):
-    username = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
+    username = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'username'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control'}))
 
-    # class Meta:
-    #     model = get_user_model()
-    #     fields = ('username', 'password')
+    class Meta:
+        model = my_model.User
+        fields = ('username', 'password')
 
 
+    def clean(self):
+        super().clean()
+        username = self.cleaned_data.get('username') 
+        password = self.cleaned_data.get('password')
+        user = authenticate(username=username, password=password)
+        if not user or not user.is_active:
+            raise forms.ValidationError('username or password is incorrect')
+        
+        return self.cleaned_data
+
+
+    def login(self, request):
+        username = self.cleaned_data.get('username') 
+        password = self.cleaned_data.get('password')
+        user = authenticate(username=username, password=password)
+        return user
+
+        
+        
 class PostForm(forms.ModelForm):
     class Meta:
         model = my_model.Post
         fields = ('content', )
         widgets = {
-            'content': forms.Textarea(attrs={'cols':50, 'rows':4, 'class':'form-control'})
+            'content': forms.Textarea(attrs={'cols':50, 'rows':3, 'class':'form-control',
+                                            'placeholder':"what's up?"})
         }
 
 

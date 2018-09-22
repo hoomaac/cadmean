@@ -13,20 +13,27 @@
     
             <form method="POST" action="">
               {% csrf_token %}
-                {% for field in form %}
-                  {% if field.errors %}
-                      {% for error in field.errors %}
-                      <div class="alert alert-danger">{{error}}</div>
-                      {% endfor %}
-                  {% endif %}
-                  <div class="input-group mb-3">
-                    {{field}}
-                  </div>
-                {% endfor %}
+              
+              
+              <div class="alter alert-danger">
+                <ul class="list-group">
+                  {% for error in form.non_field_errors %}
+                  <li class="list-group-item list-group-item-danger">{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+              
+              <hr>
+              
+              {% for field in form %}
+              
+                <div class="input-group mb-3">
+                  {{field}}
+                </div>
+              {% endfor %}
     
     
-                <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
-    
+              <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
              
             </form>
     
