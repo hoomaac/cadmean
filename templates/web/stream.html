@@ -1,19 +1,26 @@
 {% extends "layout.html" %}
 
 
-{% block content%}
+{% block content %}
 
 {% for post in stream %}
 
-        <div class="card">
+        <div class="row">
+
+                <div class="col-3"></div>
+
+            <div class="col-6">
+                    
+        <div class="card mb-3">
           <div class="card-header">
                 <div class="row">
                     <div class="col-11">
-                        <h2>
-                    <a href="{% url 'stream' username=post.user.username %}">
-                        {{post.user.username}}
-                    </a>
-                </h2>
+                        <h3>
+                            <a href="{% url 'stream' %}{{post.user.username}}">
+                                @
+                                {{post.user.username}}
+                            </a>
+                        </h3>
                     </div>
                     
                 </div>
@@ -23,15 +30,26 @@
             {{post.content}}
 
               <p class="card-text"><small class="text-muted">
-                <time datetime="{{ post.timestamp.ctime() )}}">
-                   {{ post.timestamp.ctime}}
+                <time>
+                    
+                    {{post.timestamp.ctime}}
+                    
+                    
                 </time>
             </small></p>
 
           </div>
+          <!-- <span class="border border-primary"></span> -->
         </div>
+        
+    </div>
 
-        <hr>
+    <div class="col-3"></div>
+    
+    </div>
+
+        
+        
 
     {% endfor %}
 

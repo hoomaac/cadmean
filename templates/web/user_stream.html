@@ -3,8 +3,138 @@
 
 {% block content%}
 
-<h2>user_stream page</h2>
+<div class="row justify-content-md-center align-items-center">
+    <div class="col-sm-3 col-xs-12 ROOD">
+            {% if user.is_authenticated %}
+            {% if user != current_user %}
+            {% if not current_user in user.following %}
 
-{{username}}
+            <a class="btn btn-primary" href="{% url 'follow' current_user.username %}">follow</a>
+            {% else %}
+            
+            <a class="btn btn-primary" href="{% url 'unfollow' current_user.username %}">unfollow</a>    
+            {% endif %}
+
+            {% endif %}
+
+        {% endif %}
+            
+
+
+    </div>
+        <div class="col-sm-6 col-xs-12 ROOD text-center ">
+
+            <div class="card bg-info text-white">
+                    <div class="card-body d-flex justify-content-center align-self-stretch">
+
+            
+                <div class="mx-auto ">
+                    <h5>
+                        Posts
+                    </h5>
+
+                    <p>{{ current_user.posts.count}}</p>
+
+                </div>
+
+                <div class="mx-auto">
+
+                    <h5>
+                        Followers
+                    </h5>
+
+                    <p>{{current_user.follower.count}}</p>
+
+
+                </div>
+
+                <div class="mx-auto">
+
+                    <h5>
+                        Followings
+                    </h5>
+
+                    <p>{{current_user.following.count}}</p>
+
+                </div>
+
+                
+            
+        </div> <!-- end of card body -->
+        
+
+            </div> <!-- end of card div -->
+
+
+        </div>
+    
+    
+    <div class="col-sm-3 col-xs-12 nieuws PAARS"></div>
+  </div>
+
+  
+
+    {% for post in stream %}
+
+    <div class="row justify-content-md-center align-items-center my-3">
+
+            <div class="col-3"></div>
+
+                <div class="col-6">
+                
+                    <div class="card mb-3">
+                        <div class="card-header">
+                        <div class="row ">
+                            <div class="col-11"></div>
+                            <div class="col-1">
+                                {% if user.is_authenticated %}
+                                {% if user == current_user %}
+                                <div class="col-1 text-right">
+                                    <a href="{% url 'delete_post' post.id %}">
+                                        <i class="fas fa-trash">
+            
+                                        </i>
+                                    </a>
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+
+                            {{post.content}}
+
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <time>
+                        
+                                            {{post.timestamp.ctime}}
+                        
+                        
+                                        </time>
+                                </small>
+                            </p>
+
+                            </div>
+
+      </div>
+      <!-- <span class="border border-primary"></span> -->
+    </div>
+    
+
+<div class="col-3"></div>
+
+</div>
+
+    {% endfor %}
+
+
+  </div>
+
+
+
 
 {% endblock %}
+
+

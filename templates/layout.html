@@ -40,17 +40,19 @@
 <header>
 
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">LOGO</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #ffebcd;">
+            <a class="navbar-brand" href="#">
+                <img src="/docs/4.0/assets/brand/bootstrap-solid.svg" width="30" height="30" alt="">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
 
-            <ul class="navbar-nav">
+            <ul class="navbar-nav mr-auto">
                  
-                    <li class="nav-item"> 
+                    <li class="nav-item text-white"> 
 
                     {% if user.is_authenticated %}
                     <a class="nav-link" href="{% url 'logout' %}">Logout</a>
@@ -74,12 +76,21 @@
                 </li>
                 {% endif %}
                 
+                {% if user.is_authenticated %}
                 <li class="nav-item">
                     <a href="{% url 'stream' %}" class="nav-link">Stream</a>
 
+                </li>   
+                {% endif %}
+
+            </ul>
+
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                <li class="nav-item ml-auto">
+                    <span class="navbar-text "> welcome {{user.username}} </span>
                 </li>
-
-
+                {% endif %}
             </ul>
 
         </div>
@@ -98,12 +109,12 @@
 
         {% if messages %}
         {% for message in messages %}
-            <div class="alter alert-{{message.tags}} alert-dismissible fade show" role="alert">
-                <h5>{{message}}</h5>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-            </button>
-            </div>
+        <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                {{message}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+        </div>
         {% endfor %}
         {% endif %}
 

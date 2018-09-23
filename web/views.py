@@ -10,6 +10,10 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.generic.edit import FormView
 from django.contrib import messages
 from django.utils.decorators import method_decorator
+from django.core.exceptions import ObjectDoesNotExist
+import datetime
+from django.db import IntegrityError
+
 
 from . import forms as my_form
 from . import models as my_model
@@ -144,20 +148,78 @@ def stream(request, username=None):
     if username and username != request.user.username:
         user = my_model.User.objects.get(username=username)
         if user:
-            stream = user.posts.all().order_by('-id')[:10]
+            print('current user is: ', user.username)
+            stream = user.posts.all().order_by('-id')[:10]            
         
     else:
         stream = request.user.get_stream()
         user = request.user
-        print('user does not exist')
 
     if username:
         template_name = 'web/user_stream.html'
 
-    return render(request, template_name, {'stream':stream, 'user':user})
 
 
-# @login_required
-# def user_stream(request, username):
+    return render(request, template_name, {'stream':stream, 
+                                            'current_user':user})
 
-#     return render(request, 'web/user_stream.html', {'username':username})
+
+@login_required
+def follow(request, username):
+
+    try:
+        to_user = my_model.User.objects.get(username__iexact=username)
+        print('follow', to_user.username)
+    except ObjectDoesNotExist:
+        #TODO: abort to 404 page
+        print('object doesnt exist')
+        pass
+
+    else:
+        try:
+            my_model.RelationShip.objects.create(from_user=request.user,to_user=to_user)
+        
+        except IntegrityError:
+            pass
+
+        else:                                    
+            messages.success(request, "you're following {}".format(to_user.username))
+
+    # return render(request, 'web/user_stream.html', {'current_user':to_user.username})
+    return redirect('user_stream', username=to_user.username)
+
+
+@login_required
+def unfollow(request, username):
+    
+    try:
+        to_user = my_model.User.objects.get(username__iexact=username)
+        print('follow', to_user.username)
+
+    except ObjectDoesNotExist:
+        #TODO: abort to 404 page
+        print('object doesnt exist')
+        pass
+
+    else:
+        try:
+            my_model.RelationShip.objects.get(from_user=request.user,to_user=to_user).delete()
+        
+        except IntegrityError:
+            pass
+            
+        else:                                    
+            messages.success(request, "you've unfollowed {}".format(to_user.username))
+
+    # return render(request, 'web/user_stream.html', {'current_user':to_user.username})
+    return redirect('stream')
+
+
+@login_required
+def delete_post(request, post_id):
+
+    my_model.Post.objects.get(id=post_id).delete()
+    return redirect('user_stream', username=request.user.username)
+
+
+

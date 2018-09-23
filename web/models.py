@@ -77,13 +77,23 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.is_admin
 
 
+
     def get_post(self):
-        return Post.objects.filter(user__username=self)
+        return Post.objects.filter(user=self)
     
     def get_stream(self):
-        return Post.objects.filter(
-            user__username = self
+        return (
+            Post.objects.filter(user = self) | Post.objects.all()
         )
+        
+
+    def follower(self):
+        return User.objects.filter(relationships__to_user=self)
+
+    def following(self):
+        User.objects.filter(related_to__from_user=self)
+        return User.objects.filter(related_to__from_user=self)
+
 
 
 class Post(models.Model):
@@ -93,6 +103,7 @@ class Post(models.Model):
 
     class Meta:
         ordering = ('-timestamp',)
+        
 
 
 class Token(models.Model):
@@ -102,3 +113,18 @@ class Token(models.Model):
     def __str__(self):
         return '{}_token'.format(self.user)
 
+
+class RelationShip(models.Model):
+
+    from_user = models.ForeignKey(User, related_name='relationships', on_delete=models.CASCADE)
+    to_user = models.ForeignKey(User, related_name='related_to', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('from_user', 'to_user')
+        indexes = [
+            models.Index(fields=['from_user', 'to_user'])
+        ]
+
+
+    def __str__(self):
+        return '{} is following {}'.format(self.from_user.username, self.to_user.username)
